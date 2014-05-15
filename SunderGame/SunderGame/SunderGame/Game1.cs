@@ -11,18 +11,26 @@ using Microsoft.Xna.Framework.Media;
 
 namespace SunderGame
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
+
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        SpriteBatch nowDraw;
+
+        Rectangle mouseRect;
+
+        int resolutionWidth, resolutionHeight;
+        List<Texture2D> buttonTextures;
+
+        Menu mainMenu;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.IsFullScreen = true;
+            IsMouseVisible = true;
+           
         }
 
         /// <summary>
@@ -33,8 +41,17 @@ namespace SunderGame
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
 
+            MouseState mouse = Mouse.GetState();
+
+            resolutionWidth = graphics.PreferredBackBufferWidth;
+            resolutionHeight = graphics.PreferredBackBufferHeight;
+
+            mouseRect = new Rectangle(mouse.X, mouse.Y, 1, 1);
+
+            buttonTextures = new List<Texture2D>();
             base.Initialize();
         }
 
@@ -45,8 +62,11 @@ namespace SunderGame
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            mainMenu = new Menu(graphics, mouseRect, resolutionWidth, resolutionHeight);
+            mainMenu.setButtons();
+            buttonTextures.Add(Content.Load<Texture2D>("playButton"));
+            nowDraw = new SpriteBatch(GraphicsDevice);
+            
             // TODO: use this.Content to load your game content here
         }
 
@@ -70,6 +90,11 @@ namespace SunderGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            KeyboardState kb = Keyboard.GetState();
+
+            if (kb.IsKeyDown(Keys.Escape))
+                this.Exit();
+
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -81,9 +106,13 @@ namespace SunderGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
-            // TODO: Add your drawing code here
+            nowDraw.Begin();
+
+            mainMenu.drawButtons(buttonTextures, nowDraw);
+
+            nowDraw.End();
 
             base.Draw(gameTime);
         }
