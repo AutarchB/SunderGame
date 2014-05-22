@@ -14,6 +14,8 @@ namespace SunderGame
     class Menu
     {
         GraphicsDeviceManager graphics;
+        Game1 sunder;
+        MouseState mouse;
 
         enum GameState
         {
@@ -26,14 +28,17 @@ namespace SunderGame
 
         int screenWidth, screenHeight;
 
-        Rectangle playButton, helpButton, exitButton, mouseRect;
+        Rectangle playButton, mouseRect;
 
-        public Menu(GraphicsDeviceManager graphics, Rectangle mouseRect, int screenWidth, int screenHeight)
+        public Menu(GraphicsDeviceManager graphics, Rectangle mouseRect, int screenWidth, int screenHeight, MouseState mouse)
         {
             this.graphics = graphics;
             this.mouseRect = mouseRect;
             this.screenHeight = screenHeight;
             this.screenWidth = screenWidth;
+            this.mouse = mouse;
+
+            sunder = new Game1();
 
 
         }
@@ -44,13 +49,15 @@ namespace SunderGame
                 graphics.GraphicsDevice.Viewport.Width-graphics.GraphicsDevice.Viewport.Width/3,
                 graphics.GraphicsDevice.Viewport.Height-graphics.GraphicsDevice.Viewport.Height/2,
                 screenWidth/4,
-                screenHeight/12);
+                screenHeight/20);
         }
 
         public void checkMenuActions()
         {
             KeyboardState kb = Keyboard.GetState();
-            MouseState mouse = Mouse.GetState();
+
+            if (kb.IsKeyDown(Keys.Escape))
+                sunder.Exit();
 
             if (mouseRect.Intersects(playButton) && mouse.LeftButton == ButtonState.Pressed)
             {
@@ -64,14 +71,13 @@ namespace SunderGame
             {
                 case GameState.MainMenu:
                     {
-
-                        sb.Draw(menuTextures[0], playButton, Color.Chartreuse);
-
+                        sb.Draw(menuTextures[0], playButton, Color.White);
                         break;
                     }
                 case GameState.Quit:
                     {
-                        this.Exit();
+                        sunder.Exit();
+                        break;
                     }
                    
             }

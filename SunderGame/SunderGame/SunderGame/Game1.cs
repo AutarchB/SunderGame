@@ -28,7 +28,6 @@ namespace SunderGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.IsFullScreen = true;
             IsMouseVisible = true;
            
         }
@@ -41,8 +40,8 @@ namespace SunderGame
         /// </summary>
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1080;
 
             MouseState mouse = Mouse.GetState();
 
@@ -52,6 +51,9 @@ namespace SunderGame
             mouseRect = new Rectangle(mouse.X, mouse.Y, 1, 1);
 
             buttonTextures = new List<Texture2D>();
+
+            mainMenu = new Menu(graphics, mouseRect, resolutionWidth, resolutionHeight, mouse);
+            mainMenu.setButtons();
             base.Initialize();
         }
 
@@ -62,8 +64,7 @@ namespace SunderGame
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            mainMenu = new Menu(graphics, mouseRect, resolutionWidth, resolutionHeight);
-            mainMenu.setButtons();
+
             buttonTextures.Add(Content.Load<Texture2D>("playButton"));
             nowDraw = new SpriteBatch(GraphicsDevice);
             
@@ -90,10 +91,9 @@ namespace SunderGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            KeyboardState kb = Keyboard.GetState();
+            mainMenu.checkMenuActions();
 
-            if (kb.IsKeyDown(Keys.Escape))
-                this.Exit();
+            KeyboardState kb = Keyboard.GetState();
 
             // TODO: Add your update logic here
 
@@ -109,7 +109,6 @@ namespace SunderGame
             GraphicsDevice.Clear(Color.White);
 
             nowDraw.Begin();
-
             mainMenu.drawButtons(buttonTextures, nowDraw);
 
             nowDraw.End();
