@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.IO;
 
 namespace SunderGame
 {
@@ -15,7 +16,6 @@ namespace SunderGame
     {
         GraphicsDeviceManager graphics;
         Game1 sunder;
-        MouseState mouse;
 
         enum GameState
         {
@@ -30,13 +30,11 @@ namespace SunderGame
 
         Rectangle playButton, mouseRect;
 
-        public Menu(GraphicsDeviceManager graphics, Rectangle mouseRect, int screenWidth, int screenHeight, MouseState mouse)
+        public Menu(GraphicsDeviceManager graphics, int screenWidth, int screenHeight)
         {
             this.graphics = graphics;
-            this.mouseRect = mouseRect;
             this.screenHeight = screenHeight;
             this.screenWidth = screenWidth;
-            this.mouse = mouse;
 
             sunder = new Game1();
 
@@ -52,12 +50,11 @@ namespace SunderGame
                 screenHeight/20);
         }
 
-        public void checkMenuActions()
+        public void checkMenuActions(KeyboardState kb, MouseState mouse)
         {
-            KeyboardState kb = Keyboard.GetState();
 
             if (kb.IsKeyDown(Keys.Escape))
-                sunder.Exit();
+                sunder.exitGame();
 
             if (mouseRect.Intersects(playButton) && mouse.LeftButton == ButtonState.Pressed)
             {
@@ -76,7 +73,7 @@ namespace SunderGame
                     }
                 case GameState.Quit:
                     {
-                        sunder.Exit();
+                        sunder.exitGame();
                         break;
                     }
                    

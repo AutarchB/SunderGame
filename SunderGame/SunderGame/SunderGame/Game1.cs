@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.IO;
 
 namespace SunderGame
 {
@@ -16,8 +17,21 @@ namespace SunderGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch nowDraw;
+        MouseState mouse;
 
-        Rectangle mouseRect;
+        Rectangle mouseRect, playButton;
+
+        bool onCharSelect;
+
+        enum GameState
+        {
+            MainMenu,
+            HelpMenu,
+            CharSelectMenu,
+            InGame,
+            Quit
+        }
+        GameState currentGameState = GameState.MainMenu;
 
         int resolutionWidth, resolutionHeight;
         List<Texture2D> buttonTextures;
@@ -28,6 +42,8 @@ namespace SunderGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            this.graphics.IsFullScreen = true;
             IsMouseVisible = true;
            
         }
@@ -43,16 +59,20 @@ namespace SunderGame
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
 
-            MouseState mouse = Mouse.GetState();
+            onCharSelect = false;
 
             resolutionWidth = graphics.PreferredBackBufferWidth;
             resolutionHeight = graphics.PreferredBackBufferHeight;
 
-            mouseRect = new Rectangle(mouse.X, mouse.Y, 1, 1);
+            playButton = new Rectangle(
+                graphics.GraphicsDevice.Viewport.Width - graphics.GraphicsDevice.Viewport.Width / 3,
+                graphics.GraphicsDevice.Viewport.Height - graphics.GraphicsDevice.Viewport.Height / 2,
+                resolutionWidth / 4,
+                resolutionHeight / 20);
 
             buttonTextures = new List<Texture2D>();
 
-            mainMenu = new Menu(graphics, mouseRect, resolutionWidth, resolutionHeight, mouse);
+            mainMenu = new Menu(graphics, resolutionWidth, resolutionHeight);
             mainMenu.setButtons();
             base.Initialize();
         }
@@ -87,17 +107,33 @@ namespace SunderGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            mainMenu.checkMenuActions();
 
             KeyboardState kb = Keyboard.GetState();
+            mouse = Mouse.GetState();
+            mouseRect = new Rectangle(mouse.X, mouse.Y, 10, 10);
+
+            //mainMenu.checkMenuActions(kb, mouse);
+
+            if(kb.IsKeyDown(Keys.Escape))
+            {
+                this.Exit();
+            }
+
+            if(mouseRect.Intersects(playButton) && mouse.LeftButton==ButtonState.Pressed)
+            {
+                currentGameState = GameState.CharSelectMenu;
+                onCharSelect = true;
+            }
+
 
             // TODO: Add your update logic here
 
             base.Update(gameTime);
+        }
+
+        public void exitGame()
+        {
+            this.Exit();
         }
 
         /// <summary>
@@ -109,7 +145,27 @@ namespace SunderGame
             GraphicsDevice.Clear(Color.White);
 
             nowDraw.Begin();
-            mainMenu.drawButtons(buttonTextures, nowDraw);
+            switch (currentGameState)
+            {
+                case GameState.MainMenu:
+                    {
+                        nowDraw.Draw(buttonTextures[0], playButton, Color.White);
+                        break;
+                    }
+
+
+                case GameState.CharSelectMenu:
+                    {
+                        nowDraw.Draw(buttonTextures[0], new Rectangle(10,10,200,500), Color.White);
+                        break;
+                    }
+            }
+
+            nowDraw.Draw(buttonTextures[0], mouseRect, Color.White);
+
+            if (onCharSelect)
+                GraphicsDevice.Clear(Color.Chartreuse);
+            //mainMenu.drawButtons(buttonTextures, nowDraw);
 
             nowDraw.End();
 
