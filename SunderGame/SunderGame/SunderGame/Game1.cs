@@ -17,9 +17,10 @@ namespace SunderGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch nowDraw;
-        MouseState mouse;
 
         Rectangle mouseRect, playButton;
+
+        MouseState mouse;
 
         bool onCharSelect;
 
@@ -43,7 +44,7 @@ namespace SunderGame
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            this.graphics.IsFullScreen = true;
+            this.graphics.IsFullScreen = false;
             IsMouseVisible = true;
            
         }
@@ -58,6 +59,9 @@ namespace SunderGame
         {
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
+
+            mouse = Mouse.GetState();
+            //mouseRect = new Rectangle(mouse.X, mouse.Y, 10, 10);
 
             onCharSelect = false;
 
@@ -150,6 +154,7 @@ namespace SunderGame
                 case GameState.MainMenu:
                     {
                         nowDraw.Draw(buttonTextures[0], playButton, Color.White);
+
                         break;
                     }
 
